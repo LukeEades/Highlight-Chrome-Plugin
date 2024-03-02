@@ -1,0 +1,16 @@
+{
+    "manifest_version": 3, 
+    "name":"Highlight tool", 
+    "description": "Base Level Extension", 
+    "version": "1.0",
+    "action": {
+        "default_popup": "popup/popup.html"
+    },
+    "content_scripts": [
+        {
+            "matches":["*://*.com/*", "*://*.org/*"],
+            "js": ["scripts/script.js"] 
+        }
+    ]
+    
+}
