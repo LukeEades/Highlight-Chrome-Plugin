@@ -2,13 +2,6 @@ document.addEventListener('keydown', ()=>{
     let node = document.createElement('div'); 
     node.style.backgroundColor = "yellow"; 
     let selected = window.getSelection(); 
-    // get parent node
-    // if start node = end node just wrap with a tag inside the node
-    // split at highlighted point
-    // loop between start and end nodes
-    // traverse down to text node
-    // if start or end, find offset inside of node to highlight at
-    // surround highlighted point with tag
     let range = selected.getRangeAt(0); 
     console.log(range);  
     let parent = range.commonAncestorContainer; 
@@ -16,18 +9,21 @@ document.addEventListener('keydown', ()=>{
     let end = range.endContainer; 
     let endOffset = range.endOffset; 
     let canHighlight = false; 
-    // if(parent.childNodes.length == 0){
-    //     surroundNode(parent); 
-    // }
+    if(parent.childNodes.length == 0){
+        let textStart = parent.textContent.slice(0, range.startOffset); 
+        let textHighlight = parent.textContent.slice(range.startOffset, range.endOffset); 
+        let textEnd = parent.textContent.slice(range.endOffset, parent.textContent.length); 
+        parent.parentNode.innerHTML =`${textStart}<highlight style="background-color: yellow;">${textHighlight}</highlight>${textEnd}`;  
+        return ; 
+    }
     for(let i = 0; i < parent.childNodes.length; i++){
         if(parent.childNodes[i].contains(start)){
+
+            // ERRORS HERE
             canHighlight = true; 
             let text = getTextNodes(parent.childNodes[i])[0]; 
             let afterOffset = text.splitText(range.startOffset); 
             parent.childNodes[i].innerHTML = `${text.textContent}<highlight style="background-color: yellow;">${afterOffset.textContent}</hightlight>`; 
-            // text.textContent = text + "<highlight>" + afterOffset + "</highlight>";
-            console.log(text) 
-            console.log(afterOffset)
         }
         else if(canHighlight){
             console.log(getTextNodes(parent.childNodes[i])); 
@@ -37,6 +33,8 @@ document.addEventListener('keydown', ()=>{
             }
         }
         if(parent.childNodes[i].contains(end)){
+
+            // ERRORS HERE
             canHighlight = false; 
             let text = getTextNodes(parent.childNodes[i])[0]; 
             let afterOffset = text.splitText(endOffset); 
@@ -44,7 +42,8 @@ document.addEventListener('keydown', ()=>{
             break; 
         }
     }
-    // console.log(range.commonAncestorContainer)
+
+    selected.collapseToEnd(); 
 })
 
 // returns array of all descending text nodes from a node
@@ -52,6 +51,9 @@ function getTextNodes(node, textNodes = []){
     for(let i = 0; i < node.childNodes.length; i++){
         let type = node.childNodes[i].nodeType; 
         if(type != 3){
+            if(node.childNodes[i].nodeName == "IMG"){
+                continue; 
+            }
             getTextNodes(node.childNodes[i], textNodes); 
         }
         if(type == 3 && node.childNodes[i].nodeValue != "\n"){
