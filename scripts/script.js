@@ -11,15 +11,18 @@ document.addEventListener('keydown', ()=>{
     let canHighlight = false; 
     console.log(parent.childNodes); 
     if(parent.childNodes.length == 0){
-        let textStart = parent.textContent.slice(0, range.startOffset); 
         let textHighlight = parent.textContent.slice(range.startOffset, range.endOffset); 
-        let textEnd = parent.textContent.slice(range.endOffset, parent.textContent.length); 
-        parent.parentNode.innerHTML =`${textStart}<highlight style="background-color: yellow;">${textHighlight}</highlight>${textEnd}`;  
-        return ; 
+        // Try checking for right location later; currently is taking first match
+        parent.parentNode.innerHTML = parent.parentNode.innerHTML.replace(textHighlight, `<highlight style="background-color: yellow">${textHighlight}</highlight>`); 
+        return; 
     }
+
     let nodes = parent.childNodes; 
     for(let i = 0; i < parent.childNodes.length; i++){
-        if(nodes[i].contains(end) && !(nodes[i].contains(start))){
+        if(nodes[i].contains(end)){
+            if(end.nodeType != "#text"){
+                break; 
+            }
             canHighlight = false; 
             let textNodes = getTextNodes(nodes[i]); 
             for(let i = 0; i < textNodes.length; i++){
@@ -27,7 +30,8 @@ document.addEventListener('keydown', ()=>{
                 if(textNodes[i] == end){
                     let text = end; 
                     let afterOffset = text.splitText(range.endOffset);
-                    text.parentNode.innerHTML = `<highlight style= "background-color: yellow;">${text.textContent}</highlight>${afterOffset.textContent}`
+                    // text.parentNode.innerHTML = `<highlight style= "background-color: yellow;">${text.textContent}</highlight>${afterOffset.textContent}`
+                    text.parentNode.innerHTML = text.parentNode.innerHTML.replace(text.textContent, `<highlight style= "background-color: yellow;">${text.textContent}</highlight>`); 
                     break; 
                 }
                 surroundNode(textNodes[i]); 
@@ -36,6 +40,11 @@ document.addEventListener('keydown', ()=>{
             break; 
         }
         else if(canHighlight){
+            // console.log("hell")
+            if(nodes[i].nodeName == "#text"){
+                surroundNode(nodes[i]); 
+                continue; 
+            }
             let textNodes = getTextNodes(nodes[i]); 
             for(let i = 0; i < textNodes.length; i++){
                 surroundNode(textNodes[i]); 
@@ -46,22 +55,19 @@ document.addEventListener('keydown', ()=>{
             if(start.nodeName != "#text"){
                 continue; 
             }
-            console.log(nodes[i])
             if(nodes[i] == start){
+                console.log(nodes[i].parentNode)
+                // console.log("hello")
                 let text = start; 
-                console.log(text.parentNode); 
                 let afterOffset = text.splitText(range.startOffset); 
-                nodes[i].parentNode.innerHTML = `${text.textContent}<highlight style= "background-color: yellow;">${afterOffset.textContent}</highlight>`; 
-                continue; 
+                text.parentNode.innerHTML.replace(text.textContent, `<highlight style= "background-color: yellow;">${afterOffset.textContent}</highlight>`); 
             }
-            // maybe edit this to include above as well
             let textNodes = getTextNodes(nodes[i]); 
             for(let i = 0; i < textNodes.length; i++){
                 if(textNodes[i] == start){
                     let text = start; 
-                    console.log(text.parentNode); 
                     let afterOffset = text.splitText(range.startOffset); 
-                    textNodes[i].parentNode.innerHTML = `${text.textContent}<highlight style= "background-color: yellow;">${afterOffset.textContent}</highlight>`; 
+                    text.parentNode.innerHTML.replace(text.textContent, `<highlight style= "background-color: yellow;">${afterOffset.textContent}</highlight>`); 
                     continue; 
                 }
                 surroundNode(textNodes[i]); 
