@@ -9,42 +9,62 @@ document.addEventListener('keydown', ()=>{
     let end = range.endContainer; 
     let endOffset = range.endOffset; 
     let canHighlight = false; 
-    if(parent.childNodes.length == 0){
-        let textStart = parent.textContent.slice(0, range.startOffset); 
-        let textHighlight = parent.textContent.slice(range.startOffset, range.endOffset); 
-        let textEnd = parent.textContent.slice(range.endOffset, parent.textContent.length); 
-        parent.parentNode.innerHTML =`${textStart}<highlight style="background-color: yellow;">${textHighlight}</highlight>${textEnd}`;  
-        return ; 
-    }
+    console.log(parent.childNodes); 
+    // if(parent.childNodes.length == 0){
+    //     let textStart = parent.textContent.slice(0, range.startOffset); 
+    //     let textHighlight = parent.textContent.slice(range.startOffset, range.endOffset); 
+    //     let textEnd = parent.textContent.slice(range.endOffset, parent.textContent.length); 
+    //     parent.parentNode.innerHTML =`${textStart}<highlight style="background-color: yellow;">${textHighlight}</highlight>${textEnd}`;  
+    //     return ; 
+    // }
+    let nodes = parent.childNodes; 
     for(let i = 0; i < parent.childNodes.length; i++){
-        if(parent.childNodes[i].contains(start)){
-
-            // ERRORS HERE
-            canHighlight = true; 
-            let text = getTextNodes(parent.childNodes[i])[0]; 
-            let afterOffset = text.splitText(range.startOffset); 
-            parent.childNodes[i].innerHTML = `${text.textContent}<highlight style="background-color: yellow;">${afterOffset.textContent}</hightlight>`; 
+        
+        if(nodes[i].contains(end)){
+            canHighlight = false; 
+            if(nodes[i] == end){
+                let text = end; 
+                let afterOffset = text.splitText(range.endOffset);
+                text.parentNode.innerHTML = `<highlight style: "background-color: yellow;">${text.textContent}</highlight>${afterOffset.textContent}`
+                break; 
+            }
+            let textNodes = getTextNodes(nodes[i]); 
+            for(let i = 0; i < textNodes.length; i++){
+                if(textNodes[i] == end){
+                    break;
+                }
+                surroundNode(textNodes[i]); 
+                
+            }
+            break; 
         }
         else if(canHighlight){
-            console.log(getTextNodes(parent.childNodes[i])); 
-            let textNodes = getTextNodes(parent.childNodes[i]); 
-            for(let i = 0; i <textNodes.length; i++){
+            let textNodes = getTextNodes(nodes[i]); 
+            console.log(nodes[i]); 
+            for(let i = 0; i < textNodes.length; i++){
                 surroundNode(textNodes[i]); 
             }
         }
-        if(parent.childNodes[i].contains(end)){
-
-            // ERRORS HERE
-            canHighlight = false; 
-            let text = getTextNodes(parent.childNodes[i])[0]; 
-            let afterOffset = text.splitText(endOffset); 
-            parent.childNodes[i].innerHTML = `<highlight style="background-color: yellow">${text.textContent}</highlight>${afterOffset.textContent}`; 
-            break; 
+        else if(nodes[i].contains(start)){
+            canHighlight = true; 
+            if(start.nodeName != "#text"){
+                continue; 
+            }
+            if(nodes[i] == start){
+                let text = start; 
+                let afterOffset = text.splitText(range.startOffset); 
+                nodes[i].parentNode.innerHTML = `${text.textContent}<highlight>${afterOffset.textContent}</highlight>`; 
+                continue; 
+            }
+            // maybe edit this to include above as well
+            let textNodes = getTextNodes(nodes[i]); 
+            for(let i = 0; i < textNodes.length; i++){
+                surroundNode(textNodes[i]); 
+            }
         }
-    }
-
-    selected.collapseToEnd(); 
-})
+        
+    // selected.collapseToEnd(); 
+}})
 
 // returns array of all descending text nodes from a node
 function getTextNodes(node, textNodes = []){
