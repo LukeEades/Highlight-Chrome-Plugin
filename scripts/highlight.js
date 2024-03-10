@@ -1,8 +1,3 @@
-
-chrome.runtime.onMessage.addListener((message)=>{
-    highlightRange(window.getSelection().getRangeAt(0)); 
-})
-// Returns array of all descending text nodes from a node
 function getTextNodes(node, textNodes = []){
     for(let i = 0; i < node.childNodes.length; i++){
         let type = node.childNodes[i].nodeType; 
@@ -37,7 +32,7 @@ function surroundNode(node, start, end, color = "yellow"){
 }
 
 // Highlights a range of text with specified color
-function highlightRange(range, color){
+export function highlightRange(range, color){
     let parent = range.commonAncestorContainer; 
     let start = range.startContainer; 
     let end = range.endContainer; 
