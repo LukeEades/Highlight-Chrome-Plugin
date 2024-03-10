@@ -1,3 +1,26 @@
+chrome.runtime.onMessage.addListener((message)=>{
+    highlightRange(window.getSelection().getRangeAt(0), document.querySelector('input[name="colorChoice"]:checked').id); 
+})
+
+let icon = document.createElement('div'); 
+let body = document.querySelector('body'); 
+icon.classList.add("highlight-icon"); 
+body.appendChild(icon); 
+let colorOptions = document.createElement('div'); 
+let colors = ["red", "orange", "yellow", "green", "blue", "purple"]; 
+for(let i = 0; i < colors.length; i++){
+    let temp = document.createElement('input'); 
+    temp.type = "radio"; 
+    temp.id = colors[i]; 
+    if(colors[i] == "yellow")
+        temp.checked = true; 
+    temp.name = "colorChoice"; 
+    temp.classList.add("color-icon"); 
+    temp.style.backgroundColor = colors[i]; 
+    colorOptions.appendChild(temp); 
+}
+icon.appendChild(colorOptions); 
+// Returns array of all descending text nodes from a node
 function getTextNodes(node, textNodes = []){
     for(let i = 0; i < node.childNodes.length; i++){
         let type = node.childNodes[i].nodeType; 
@@ -32,7 +55,7 @@ function surroundNode(node, start, end, color = "yellow"){
 }
 
 // Highlights a range of text with specified color
-export function highlightRange(range, color){
+function highlightRange(range, color){
     let parent = range.commonAncestorContainer; 
     let start = range.startContainer; 
     let end = range.endContainer; 

@@ -16,7 +16,6 @@ chrome.runtime.onMessage.addListener((request, response)=>{
 })
 chrome.contextMenus.onClicked.addListener((info,tab)=>{
     if(info.menuItemId == "select-menu"){
-        chrome.tabs.sendMessage(current, {stat: true}); 
-    //    console.log(chrome.tabs); 
+        chrome.tabs.sendMessage(current, {stat: true});  
     }
 })
