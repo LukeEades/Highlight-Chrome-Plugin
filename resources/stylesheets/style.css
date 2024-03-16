@@ -1,17 +1,44 @@
+*{
+    --icon-defualt-size: 30px;
+}
 .highlight-icon{
-    position:fixed;  
-    top: 90%; 
-    left: 90%; 
-    width: 20px; 
-    height: 20px;
-    background-color: purple; 
+    width: var(--icon-defualt-size); 
+    height: var(--icon-defualt-size);
+    border-radius: 50px; 
+    transition-duration: .25s;
+    background-color: white; 
+    outline: 3px solid black; 
+    transform-origin: center center;
+    overflow: hidden; 
+    display: flex; 
+    justify-content: center;
+    align-items: center;
 }
 .color-icon{
-    appearance: none;
-    width: 20px; 
-    height: 20px; 
-    border-radius: 5px; 
+    all: initial ;
+    position:relative !important; 
+    display:block !important; 
+    margin: 0 !important; 
+    appearance: none !important;
+    width: 10px !important; 
+    height: 10px !important; 
+    border-radius: 5px !important; 
 }
 .color-icon:checked{
-    outline: 3px solid black; 
+    outline: 1px solid black; 
+}
+.icon-show{
+    width: calc(var(--icon-defualt-size) + 30px); 
+    height: calc(var(--icon-defualt-size) + 30px); 
+}
+.center-icon{
+    position:fixed;   
+    width: 10%; 
+    height: 10%;
+    top: 90%; 
+    left: 90%; 
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center; 
 }

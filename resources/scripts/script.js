@@ -1,25 +1,54 @@
-chrome.runtime.onMessage.addListener((message)=>{
-    highlightRange(window.getSelection().getRangeAt(0), document.querySelector('input[name="colorChoice"]:checked').id); 
+chrome.runtime.onMessage.addListener((message) => {
+    let range = window.getSelection().getRangeAt(0); 
+    let getPath = new StoreDom(); 
+    let path = getPath.makeXpath(range.startContainer); 
+    console.log(path); 
+    let element = getPath.getNodeFromPath(path); 
+    console.log(element); 
+
+    // maybe use range.cloneContents(); 
+    // console.log(JSON.stringify(selection.commonAncestorContainer, ["innerHTML"])); 
+    // console.log(selection);   
+    // chrome.storage.local.set({"node": "n"}).then((e)=>{
+    //     console.log(e); 
+    // })
+    // chrome.storage.local.get(["node"]).then((result)=>{
+    //     console.log(result); 
+    // })
+    // highlightRange(selection, document.querySelector('input[name="colorChoice"]:checked').id); 
 })
 
 let icon = document.createElement('div'); 
 let body = document.querySelector('body'); 
+let centerIcon = document.createElement('div'); 
+body.appendChild(centerIcon); 
+centerIcon.classList.add('center-icon'); 
 icon.classList.add("highlight-icon"); 
-body.appendChild(icon); 
+centerIcon.appendChild(icon); 
 let colorOptions = document.createElement('div'); 
 let colors = ["red", "orange", "yellow", "green", "blue", "purple"]; 
 for(let i = 0; i < colors.length; i++){
     let temp = document.createElement('input'); 
     temp.type = "radio"; 
     temp.id = colors[i]; 
-    if(colors[i] == "yellow")
+    if(colors[i] == "yellow"){
         temp.checked = true; 
+    }
     temp.name = "colorChoice"; 
-    temp.classList.add("color-icon"); 
+    temp.classList.add("color-icon");    
     temp.style.backgroundColor = colors[i]; 
     colorOptions.appendChild(temp); 
 }
+
 icon.appendChild(colorOptions); 
+let menuOut = false; 
+icon.addEventListener('mouseenter', (e)=>{
+    icon.classList.toggle('icon-show'); 
+})
+icon.addEventListener('mouseleave', (e)=>{
+    icon.classList.toggle('icon-show'); 
+})
+
 // Returns array of all descending text nodes from a node
 function getTextNodes(node, textNodes = []){
     for(let i = 0; i < node.childNodes.length; i++){
@@ -39,6 +68,7 @@ function getTextNodes(node, textNodes = []){
 
 // Surrounds a text area, defined by start and end, with a highlight node of specified color
 function surroundNode(node, start, end, color = "yellow"){
+    // Notes: Consider TextNode splitText function
     let parent = node.parentNode; 
     let newNode = document.createElement("highlight"); 
     newNode.style.backgroundColor = color; 

@@ -19,7 +19,7 @@
     "content_scripts": [
         {
             "matches": ["http://*/*", "https://*/*"],
-            "js": ["resources/scripts/script.js"],
+            "js": ["resources/scripts/script.js", "resources/scripts/rangeData.js"],
             "css": ["resources/stylesheets/style.css"]
         }
     ]
