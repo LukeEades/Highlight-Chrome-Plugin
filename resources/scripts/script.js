@@ -1,10 +1,11 @@
 chrome.runtime.onMessage.addListener((message) => {
     let range = window.getSelection().getRangeAt(0); 
-    let getPath = new StoreDom(); 
-    let path = getPath.makeXpath(range.startContainer); 
+    let path = DomStorage.makeXpath(range.startContainer); 
     console.log(path); 
-    let element = getPath.getNodeFromPath(path); 
-    console.log(element); 
+    let element = DomStorage.getNodeFromPath(path); 
+    console.log(range); 
+    console.log(new JsonRange(range)); 
+
 
     // maybe use range.cloneContents(); 
     // console.log(JSON.stringify(selection.commonAncestorContainer, ["innerHTML"])); 
