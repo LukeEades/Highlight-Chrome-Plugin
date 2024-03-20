@@ -1,8 +1,21 @@
 chrome.runtime.onMessage.addListener((message) => {
     let range = window.getSelection().getRangeAt(0); 
-    let jsonRange = RangeStorage.JsonRange(range); 
-    let parsedRange = RangeStorage.getRangeFromJson(jsonRange); 
-    console.log(parsedRange); 
+    let jsonRange = JSON.stringify(RangeStorage.JsonRange(range)); 
+    let key = String(window.location.href); 
+    // chrome.storage.local.get([key]).then((value)=>{
+    //     let newVal = value[key]?[...value[key]]: []; 
+    //     newVal.push(jsonRange); 
+    //     console.log(value[key]); 
+    //     // chrome.storage.local.set({key: newVal}).then(()=>{
+    //     //     console.log("set"); 
+    //     // })
+    // })
+    chrome.storage.local.set({[key]: "h"}).then(()=>{
+        console.log('w')
+    })
+    chrome.storage.local.get([key]).then((val)=>{
+        console.log(val[key]); 
+    })
 })
 
 let icon = document.createElement('div'); 
