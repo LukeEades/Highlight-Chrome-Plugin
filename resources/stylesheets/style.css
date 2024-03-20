@@ -18,13 +18,16 @@
     all: initial ;
     position:relative !important; 
     display:block !important; 
-    margin: 0 !important; 
+    margin: 0 !important;
+    padding: 0 !important;  
     appearance: none !important;
+    content: "" !important; 
     width: 10px !important; 
     height: 10px !important; 
     border-radius: 5px !important; 
 }
 .color-icon:checked{
+    content: "" !important; 
     outline: 1px solid black; 
 }
 .icon-show{

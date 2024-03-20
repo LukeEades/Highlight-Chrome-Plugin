@@ -1,22 +1,8 @@
 chrome.runtime.onMessage.addListener((message) => {
     let range = window.getSelection().getRangeAt(0); 
-    console.log(range);  
     let jsonRange = RangeStorage.JsonRange(range); 
-    console.log(jsonRange); 
-    let range2 = RangeStorage.getRangeFromJson(jsonRange); 
-    console.log(range2); 
-    console.log(range2.startContainer == range.startContainer);
-
-    // maybe use range.cloneContents(); 
-    // console.log(JSON.stringify(selection.commonAncestorContainer, ["innerHTML"])); 
-    // console.log(selection);   
-    // chrome.storage.local.set({"node": "n"}).then((e)=>{
-    //     console.log(e); 
-    // })
-    // chrome.storage.local.get(["node"]).then((result)=>{
-    //     console.log(result); 
-    // })
-    // highlightRange(selection, document.querySelector('input[name="colorChoice"]:checked').id); 
+    let parsedRange = RangeStorage.getRangeFromJson(jsonRange); 
+    console.log(parsedRange); 
 })
 
 let icon = document.createElement('div'); 
