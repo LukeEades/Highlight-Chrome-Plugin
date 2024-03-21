@@ -6,7 +6,7 @@ chrome.tabs.onActivated.addListener((info)=>{
 chrome.runtime.onInstalled.addListener((details)=>{
     chrome.contextMenus.create({
         id: "select-menu", 
-        title: "does a thing",
+        title: "Highlight",
         contexts: ["selection"]
     })
 

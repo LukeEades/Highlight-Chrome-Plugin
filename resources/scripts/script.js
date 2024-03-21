@@ -3,16 +3,15 @@ chrome.runtime.onMessage.addListener((message) => {
     let jsonRange = JSON.stringify(RangeStorage.JsonRange(range)); 
     let key = String(window.location.href); 
     // chrome.storage.local.clear(); 
-    // console.log(jsonRange); 
-    let range2 = RangeStorage.getRangeFromJson(JSON.parse(jsonRange)); 
-    // console.log(range2); 
     chrome.storage.local.get([key]).then((value)=>{
         let newVal = value[key]?[...value[key]]: []; 
-        newVal.push(jsonRange); 
-        // chrome.storage.local.set({[key]: newVal}).then(()=>{
-        //     console.log("set"); 
-        //     // console.log(value[key]); 
-        // })
+        let index = newVal.length? `highlight-extension${Number(value[key][newVal.length - 1].id[value[key][newVal.length - 1].id.length -1]) + 1}`: `highlight-extension0`; 
+        let currentColor = colorOptions.querySelector('input:checked').style.backgroundColor;  
+        let dataOb = {id: index, data: jsonRange, color: currentColor}; 
+        newVal.push(dataOb); 
+        chrome.storage.local.set({[key]: newVal}).then(()=>{
+            console.log("set"); 
+        })
     })
 })
 let body = document.querySelector('body'); 
@@ -53,11 +52,11 @@ function showStoredRanges(url){
         if(val[url]){
             let ranges = val[url]; 
             for(let i = 0; i < ranges.length; i++){
-                let parsed = JSON.parse(ranges[i]); 
-                console.log("parsed: ", parsed); 
+                let parsed = JSON.parse(ranges[i].data); 
+                // console.log("parsed: ", parsed); 
                 let range = RangeStorage.getRangeFromJson(parsed); 
-                console.log(range); 
-                highlightRange(RangeStorage.getRangeFromJson(JSON.parse(ranges[i]))); 
+                // console.log(range); 
+                highlightRange(range, ranges[i].color, ranges[i].id); 
             }
 
         }
@@ -69,7 +68,7 @@ function getTextNodes(node, textNodes = []){
     for(let i = 0; i < node.childNodes.length; i++){
         let type = node.childNodes[i].nodeType; 
         if(type != 3){
-            if(node.childNodes[i].nodeName == "IMG"){
+            if(node.childNodes[i].nodeName == "IMG" || node.childNodes[i].nodeName == "MARK"){
                 continue; 
             }
             getTextNodes(node.childNodes[i], textNodes); 
@@ -82,11 +81,12 @@ function getTextNodes(node, textNodes = []){
 }
 
 // Surrounds a text area, defined by start and end, with a highlight node of specified color
-function surroundNode(node, start, end, color = "yellow"){
+function surroundNode(node, start, end, color = "yellow", id){
     // Notes: Consider TextNode splitText function
     let parent = node.parentNode; 
     let newNode = document.createElement("mark"); 
     newNode.style.backgroundColor = color; 
+    newNode.id = id;
     let text = node.textContent; 
     let before = document.createTextNode(text.slice(0, start)); 
     let middle = document.createTextNode(text.slice(start, end)); 
@@ -100,7 +100,7 @@ function surroundNode(node, start, end, color = "yellow"){
 }
 
 // Highlights a range of text with specified color
-function highlightRange(range, color){
+function highlightRange(range, color, id){
     let parent = range.commonAncestorContainer; 
     let start = range.startContainer; 
     let end = range.endContainer; 
@@ -109,7 +109,7 @@ function highlightRange(range, color){
     let canHighlight = false; 
 
     if(parent.childNodes.length == 0){
-        surroundNode(parent, startOffset, endOffset, color)
+        surroundNode(parent, startOffset, endOffset, color, id)
         return; 
     }
     let nodes = parent.childNodes; 
@@ -119,17 +119,17 @@ function highlightRange(range, color){
             for(let j =0; j< textNodes.length; j++){
                 if(textNodes[j] == end){
                     canHighlight = false; 
-                    surroundNode(textNodes[j], 0, endOffset, color); 
+                    surroundNode(textNodes[j], 0, endOffset, color, id); 
                     j += 2; 
                     return; 
                 }
                 else if(canHighlight){
-                    surroundNode(textNodes[j], 0, textNodes[j].length, color); 
+                    surroundNode(textNodes[j], 0, textNodes[j].length, color, id); 
                     j+= 2; 
                 }
                 else if(textNodes[j] == start){
                     canHighlight = true; 
-                    surroundNode(textNodes[j], startOffset, textNodes[j].length, color); 
+                    surroundNode(textNodes[j], startOffset, textNodes[j].length, color, id); 
                     j+= 2; 
                 }
             }
@@ -137,17 +137,17 @@ function highlightRange(range, color){
         else{
             if(nodes[i] == end){
                 canHighlight = false; 
-                surroundNode(nodes[i], 0, endOffset, color); 
+                surroundNode(nodes[i], 0, endOffset, color, id); 
                 i += 2; 
                 return; 
             }
             else if(canHighlight){
-                surroundNode(nodes[i], 0, nodes[i].length, color); 
+                surroundNode(nodes[i], 0, nodes[i].length, color, id); 
                 i+= 2; 
             }
             else if(nodes[i] == start){
                 canHighlight = true; 
-                surroundNode(nodes[i], startOffset, nodes[i].length, color); 
+                surroundNode(nodes[i], startOffset, nodes[i].length, color, id); 
                 i+= 2; 
             } 
         }        
