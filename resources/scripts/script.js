@@ -2,24 +2,23 @@ chrome.runtime.onMessage.addListener((message) => {
     let range = window.getSelection().getRangeAt(0); 
     let jsonRange = JSON.stringify(RangeStorage.JsonRange(range)); 
     let key = String(window.location.href); 
-    // chrome.storage.local.get([key]).then((value)=>{
-    //     let newVal = value[key]?[...value[key]]: []; 
-    //     newVal.push(jsonRange); 
-    //     console.log(value[key]); 
-    //     // chrome.storage.local.set({key: newVal}).then(()=>{
-    //     //     console.log("set"); 
-    //     // })
-    // })
-    chrome.storage.local.set({[key]: "h"}).then(()=>{
-        console.log('w')
-    })
-    chrome.storage.local.get([key]).then((val)=>{
-        console.log(val[key]); 
+    // chrome.storage.local.clear(); 
+    // console.log(jsonRange); 
+    let range2 = RangeStorage.getRangeFromJson(JSON.parse(jsonRange)); 
+    // console.log(range2); 
+    chrome.storage.local.get([key]).then((value)=>{
+        let newVal = value[key]?[...value[key]]: []; 
+        newVal.push(jsonRange); 
+        // chrome.storage.local.set({[key]: newVal}).then(()=>{
+        //     console.log("set"); 
+        //     // console.log(value[key]); 
+        // })
     })
 })
+let body = document.querySelector('body'); 
+window.onload = showStoredRanges(String(document.location.href))
 
 let icon = document.createElement('div'); 
-let body = document.querySelector('body'); 
 let centerIcon = document.createElement('div'); 
 body.appendChild(centerIcon); 
 centerIcon.classList.add('center-icon'); 
@@ -49,6 +48,22 @@ icon.addEventListener('mouseleave', (e)=>{
     icon.classList.toggle('icon-show'); 
 })
 
+function showStoredRanges(url){
+    chrome.storage.local.get([url]).then((val)=>{
+        if(val[url]){
+            let ranges = val[url]; 
+            for(let i = 0; i < ranges.length; i++){
+                let parsed = JSON.parse(ranges[i]); 
+                console.log("parsed: ", parsed); 
+                let range = RangeStorage.getRangeFromJson(parsed); 
+                console.log(range); 
+                highlightRange(RangeStorage.getRangeFromJson(JSON.parse(ranges[i]))); 
+            }
+
+        }
+    })
+}
+
 // Returns array of all descending text nodes from a node
 function getTextNodes(node, textNodes = []){
     for(let i = 0; i < node.childNodes.length; i++){
@@ -70,7 +85,7 @@ function getTextNodes(node, textNodes = []){
 function surroundNode(node, start, end, color = "yellow"){
     // Notes: Consider TextNode splitText function
     let parent = node.parentNode; 
-    let newNode = document.createElement("highlight"); 
+    let newNode = document.createElement("mark"); 
     newNode.style.backgroundColor = color; 
     let text = node.textContent; 
     let before = document.createTextNode(text.slice(0, start)); 
