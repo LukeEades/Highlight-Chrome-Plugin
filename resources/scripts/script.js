@@ -3,6 +3,7 @@ chrome.runtime.onMessage.addListener((message) => {
     let jsonRange = JSON.stringify(RangeStorage.JsonRange(range)); 
     let key = String(window.location.href); 
     // chrome.storage.local.clear(); 
+    highlightRange(range); 
     chrome.storage.local.get([key]).then((value)=>{
         let newVal = value[key]?[...value[key]]: []; 
         let index = newVal.length? `highlight-extension${Number(value[key][newVal.length - 1].id[value[key][newVal.length - 1].id.length -1]) + 1}`: `highlight-extension0`; 
@@ -92,6 +93,24 @@ function surroundNode(node, start, end, color = "yellow", id){
     let middle = document.createTextNode(text.slice(start, end)); 
     let after = document.createTextNode(text.slice(end, text.length));
     newNode.innerHTML = middle.textContent; 
+    newNode.classList.add('highlight-plugin-mark')
+    newNode.addEventListener('mouseenter',(e)=>{
+        let temp = document.createElement('div'); 
+        let remove = document.createElement('button'); 
+        let text = document.createElement('input'); 
+        temp.append(remove, text); 
+        let dimensions = newNode.getBoundingClientRect(); 
+        let offsetY = dimensions.top - newNode.offsetTop; 
+        temp.classList.add('highlight-plugin-hover'); 
+        newNode.appendChild(temp); 
+        temp.style.left = `${e.layerX - temp.offsetWidth/2}px`; 
+        temp.style.top = `${dimensions.top - offsetY - temp.offsetHeight}px`;
+    })
+    newNode.addEventListener('mouseleave', (e)=>{
+        let node = newNode.querySelector('div[class="highlight-plugin-hover"]'); 
+        newNode.removeChild(node); 
+            
+    })
     parent.insertBefore(before, node); 
     parent.insertBefore(newNode, node); 
     parent.insertBefore(after, node); 
