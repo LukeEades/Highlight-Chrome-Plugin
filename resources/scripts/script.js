@@ -9,15 +9,21 @@ chrome.runtime.onMessage.addListener((message) => {
         let dataOb = {id: index, data: jsonRange, color: currentColor, comment: ""}; 
         newVal.push(dataOb); 
         chrome.storage.local.set({[key]: newVal}).then(()=>{
-            console.log("set"); 
             highlightRange(range, dataOb.color, dataOb.id); 
         })
     })
 })
+
 let url = String(document.location.href); 
 let body = document.querySelector('body'); 
-window.onload = showStoredRanges(url)
-
+let currentColor = "yellow"; 
+chrome.storage.local.get(["color"]).then((item)=>{
+    currentColor = item["color"]? item["color"]: "yellow"; 
+    colorOptions.querySelector(`input[id =${currentColor}]`).checked = true; 
+})
+window.onload = ()=>{
+    showStoredRanges(url)
+}
 let icon = document.createElement('div'); 
 let centerIcon = document.createElement('div'); 
 body.appendChild(centerIcon); 
@@ -30,12 +36,13 @@ for(let i = 0; i < colors.length; i++){
     let temp = document.createElement('input'); 
     temp.type = "radio"; 
     temp.id = colors[i]; 
-    if(colors[i] == "yellow"){
-        temp.checked = true; 
-    }
     temp.name = "colorChoice"; 
     temp.classList.add("color-icon");    
     temp.style.backgroundColor = colors[i]; 
+    temp.addEventListener('click', ()=>{
+        chrome.storage.local.set({["color"]: colors[i]}).then(()=>{
+        })
+    })
     colorOptions.appendChild(temp); 
 }
 
@@ -105,33 +112,11 @@ function surroundNode(node, start, end, color = "yellow", id){
     return; 
 }
 function addHoverUI(node){
-    // let tempNode = event; 
-    // let temp = document.createElement('div'); 
-    // let remove = document.createElement('button'); 
-    // let text = document.createElement('textarea'); 
-    // temp.append(remove, text); 
-    // let dimensions = tempNode.getBoundingClientRect(); 
-    // let offsetY = dimensions.top - tempNode.offsetTop; 
-    // temp.classList.add('highlight-plugin-hover'); 
-    // tempNode.appendChild(temp); 
-    // temp.style.left = `${event.layerX - temp.offsetWidth/2}px`; 
-    // temp.style.top = `${dimensions.top - offsetY - temp.offsetHeight}px`;
     let temp = document.createElement('div'); 
     let remove = document.createElement('button'); 
     let comment = document.createElement('textarea');
     remove.textContent = "x";
     remove.classList.add('highlight-plugin-hover-remove'); 
-    document.addEventListener('click', (e)=>{
-        let canType = false; 
-        if(e.target == comment){
-            canType = true; 
-        }
-        document.addEventListener('keypress', (key)=>{
-            if(canType){
-                comment.textContent += key.key; 
-            }
-        })
-    })
     comment.classList.add('highlight-plugin-hover-comment');
     temp.append(remove, comment);  
     temp.classList.add('highlight-plugin-hover', 'highlight-plugin-hover-hide'); 
@@ -139,37 +124,52 @@ function addHoverUI(node){
     chrome.storage.local.get([url]).then((val)=>{
         let values = val[url]; 
         let obj = values.find((item)=>item.id == node.id); 
-        comment.textContent = obj.comment; 
+        comment.value = obj.comment; 
     })
     remove.addEventListener('click', ()=>{
         chrome.storage.local.get([url]).then((val)=>{
             let values = val[url]; 
             let newArr = values.filter((item)=>item.id != node.id); 
             chrome.storage.local.set({[url]: newArr}).then(()=>{
-                console.log("set again"); 
             })
         })
         let tempNode = node.querySelector('div[class="highlight-plugin-hover"]'); 
         node.removeChild(tempNode); 
         node.outerHTML = node.innerHTML; 
     })
+    let doRemove = false; 
     node.addEventListener('mouseenter', (e)=>{
-        temp.classList.toggle('highlight-plugin-hover-hide'); 
+        temp.classList.remove('highlight-plugin-hover-hide'); 
+        let tempHover = node.querySelector('div:hover')
+        if(!tempHover){
+            temp.style.left = `${e.layerX - temp.offsetWidth/2}px`; 
+
+        }
+        chrome.storage.local.get([url]).then((val)=>{
+            let values = val[url]; 
+            let newArr = [...values];
+            let obj = newArr.find((item)=>item.id == node.id);
+            comment.value = obj.comment; 
+        })
+        doRemove = true; 
     })
     node.addEventListener('mouseleave',(e)=>{
-        temp.classList.toggle('highlight-plugin-hover-hide');
+        doRemove = false; 
+        setTimeout(() => {
+            if(!doRemove){
+                temp.classList.add('highlight-plugin-hover-hide');
+            }
+        }, 300);
         chrome.storage.local.get([url]).then((val)=>{
             let values = val[url]; 
             let newArr = [...values]; 
             let obj = newArr.find((item)=>item.id == node.id); 
-            newArr[newArr.indexOf(obj)].comment = comment.textContent? comment.textContent: "";
+            newArr[newArr.indexOf(obj)].comment = comment.value? comment.value: "";
             chrome.storage.local.set({[url]:newArr}).then(()=>{
-                console.log("set that john")
             })
-        })
+    })
     })
 }
-
 
 // Highlights a range of text with specified color
 function highlightRange(range, color, id){

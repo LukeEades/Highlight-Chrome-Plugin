@@ -1,6 +1,5 @@
 let current; 
 chrome.tabs.onActivated.addListener((info)=>{
-    console.log(info); 
     current = info.tabId; 
 })
 chrome.runtime.onInstalled.addListener((details)=>{
@@ -11,11 +10,10 @@ chrome.runtime.onInstalled.addListener((details)=>{
     })
 
 })
-chrome.runtime.onMessage.addListener((request, response)=>{
-    // console.log(window); 
-})
 chrome.contextMenus.onClicked.addListener((info,tab)=>{
     if(info.menuItemId == "select-menu"){
-        chrome.tabs.sendMessage(current, {stat: true});  
+        chrome.tabs.query({active: true, windowType: "normal", currentWindow: true}, (e)=>{
+            chrome.tabs.sendMessage(e[0].id, {stat: true});  
+        })
     }
 })
