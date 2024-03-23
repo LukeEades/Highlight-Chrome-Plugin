@@ -4,7 +4,7 @@ chrome.runtime.onMessage.addListener((message) => {
     let key = String(window.location.href); 
     chrome.storage.local.get([key]).then((value)=>{
         let newVal = value[key]?[...value[key]]: []; 
-        let index = newVal.length? `highlight-extension${Number(value[key][newVal.length - 1].id[value[key][newVal.length - 1].id.length -1]) + 1}`: `highlight-extension0`; 
+        let index = newVal.length? `highlight-extension${Number(value[key][newVal.length - 1].id[value[key][newVal.length - 1].id.length -1] + 1)}`: `highlight-extension0`; 
         let currentColor = colorOptions.querySelector('input:checked').style.backgroundColor;  
         let dataOb = {id: index, data: jsonRange, color: currentColor, comment: ""}; 
         newVal.push(dataOb); 
