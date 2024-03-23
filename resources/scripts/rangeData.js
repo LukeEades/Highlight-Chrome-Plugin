@@ -6,8 +6,7 @@ const DomStorage = (function(){
         while(element != document.body){
             const arr = [...element.parentNode.childNodes];
             let tempArr = arr.filter((item)=>item.nodeName == element.nodeName); 
-            let num = tempArr.indexOf(element);
-            // console.log(tempArr);  
+            let num = tempArr.indexOf(element); 
                         
             let textName = `/${element.nodeName}` + ((num != -1 && tempArr.length > 1)? `[${num + 1}]`: ``); 
             if(element.nodeName == "#text"){
