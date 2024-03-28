@@ -215,6 +215,6 @@ function highlightRange(range, color, id){
                 canHighlight = true; 
                 surroundNode(nodes[i], startOffset, nodes[i].length, color, id); 
             }
-        }        
+        } 
     }
 }
