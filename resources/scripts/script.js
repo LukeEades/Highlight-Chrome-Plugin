@@ -103,13 +103,12 @@ function surroundNode(node, start, end, color = "yellow", id){
     let middle = document.createTextNode(text.slice(start, end)); 
     let after = document.createTextNode(text.slice(end, text.length));
     newNode.innerHTML = middle.textContent; 
-    newNode.classList.add('highlight-plugin-mark')
+    newNode.classList.add('highlight-plugin-mark'); 
     addHoverUI(newNode); 
     parent.insertBefore(before, node); 
     parent.insertBefore(newNode, node); 
     parent.insertBefore(after, node); 
-    parent.removeChild(node);  
-    return; 
+    parent.removeChild(node) 
 }
 function addHoverUI(node){
     let temp = document.createElement('div'); 
@@ -178,31 +177,29 @@ function highlightRange(range, color, id){
     let end = range.endContainer; 
     let startOffset = range.startOffset; 
     let endOffset = range.endOffset; 
-    let canHighlight = false; 
+    let canHighlight = false;
+    
     
     if(parent.childNodes.length == 0){
         surroundNode(parent, startOffset, endOffset, color, id)
         return; 
     }
-    let nodes = parent.childNodes; 
+    let nodes = [...parent.childNodes]; 
     for(let i = 0; i < nodes.length; i++){
         if(nodes[i].nodeName != "#text"){
             let textNodes = getTextNodes(nodes[i]); 
             for(let j =0; j< textNodes.length; j++){
                 if(textNodes[j] == end){
-                    canHighlight = false; 
                     surroundNode(textNodes[j], 0, endOffset, color, id); 
-                    j += 2; 
-                    return; 
+                    canHighlight = false; 
                 }
                 else if(canHighlight){
+                    console.log(textNodes[j]); 
                     surroundNode(textNodes[j], 0, textNodes[j].length, color, id); 
-                    j+= 2; 
                 }
                 else if(textNodes[j] == start){
-                    canHighlight = true; 
                     surroundNode(textNodes[j], startOffset, textNodes[j].length, color, id); 
-                    j+= 2; 
+                    canHighlight = true; 
                 }
             }
         }
@@ -210,18 +207,14 @@ function highlightRange(range, color, id){
             if(nodes[i] == end){
                 canHighlight = false; 
                 surroundNode(nodes[i], 0, endOffset, color, id); 
-                i += 2; 
-                return; 
             }
             else if(canHighlight){
                 surroundNode(nodes[i], 0, nodes[i].length, color, id); 
-                i+= 2; 
             }
             else if(nodes[i] == start){
                 canHighlight = true; 
                 surroundNode(nodes[i], startOffset, nodes[i].length, color, id); 
-                i+= 2; 
-            } 
+            }
         }        
     }
 }
